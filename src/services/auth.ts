@@ -1,13 +1,11 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
+import type { User } from '@/types';
+
 interface LoginResponse {
   token: string;
-  user: {
-    id: string;
-    username: string;
-    email: string;
-  };
+  user: User;
 }
 
 // Mock user data for development
@@ -16,13 +14,17 @@ const MOCK_USERS = [
     username: 'admin',
     password: 'admin123',
     id: '1',
+    name: 'Administrator',
     email: 'admin@example.com',
+    role: 'admin'
   },
   {
     username: 'user',
     password: 'user123',
     id: '2',
+    name: 'Regular User',
     email: 'user@example.com',
+    role: 'user'
   },
 ];
 
@@ -43,11 +45,7 @@ export const authService = {
 
       return {
         token: `mock-token-${mockUser.id}`,
-        user: {
-          id: mockUser.id,
-          username: mockUser.username,
-          email: mockUser.email,
-        },
+        user: mockUser,
       };
     }
 

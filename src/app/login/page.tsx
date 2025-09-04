@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/auth';
 import { authService } from '@/services/auth';
 
 export default function LoginPage() {
@@ -19,8 +19,7 @@ export default function LoginPage() {
 
     try {
       const { token, user } = await authService.login(username, password);
-      login(token, user);
-      router.push('/content');
+      login(user, token);
     } catch (err) {
       setError('Login failed. Please check your credentials.');
     }
