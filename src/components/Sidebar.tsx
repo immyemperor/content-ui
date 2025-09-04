@@ -1,57 +1,118 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import {
-  Assessment as AssessmentIcon,
-  Description as DescriptionIcon,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Toolbar,
+} from '@mui/material';
+import {
   Dashboard as DashboardIcon,
+  Description as ContentIcon,
+  Assessment as AssessmentIcon,
   LibraryBooks as TemplatesIcon,
 } from '@mui/icons-material';
-
-const menuItems = [
-  { text: 'Dashboard', href: '/dashboard', icon: DashboardIcon },
-  { text: 'Content', href: '/dashboard/content', icon: DescriptionIcon },
-  { text: 'Templates', href: '/dashboard/templates', icon: TemplatesIcon },
-  { text: 'Assessments', href: '/dashboard/assessments', icon: AssessmentIcon },
-];
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useSidebar } from '@/contexts/sidebar';
 
 const drawerWidth = 240;
 
+const menuItems = [
+  { text: 'Dashboard', icon: <DashboardIcon />, href: '/dashboard' },
+  { text: 'Content', icon: <ContentIcon />, href: '/dashboard/content' },
+  { text: 'Templates', icon: <TemplatesIcon />, href: '/dashboard/templates' },
+  { text: 'Assessments', icon: <AssessmentIcon />, href: '/dashboard/assessments' },
+];
+
 export function Sidebar() {
   const pathname = usePathname();
+  const { isOpen, closeSidebar } = useSidebar();
+
+  const drawer = (
+    <>
+      <Toolbar />
+      <Box sx={{ overflow: 'auto' }}>
+        <List>
+          {menuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                component={Link}
+                href={item.href}
+                selected={pathname === item.href}
+                onClick={() => {
+                  // Only close on mobile
+                  if (window.innerWidth < 600) {
+                    closeSidebar();
+                  }
+                }}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.light',
+                    color: 'primary.contrastText',
+                    '&:hover': {
+                      backgroundColor: 'primary.main',
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: pathname === item.href ? 'primary.contrastText' : 'inherit',
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </>
+  );
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-        },
-      }}
-    >
-      <List sx={{ mt: 8 }}>
-        {menuItems.map(({ text, href, icon: Icon }) => (
-          <Link key={href} href={href} passHref style={{ textDecoration: 'none', color: 'inherit' }}>
-            <ListItem>
-              <ListItemIcon>
-                <Icon />
-              </ListItemIcon>
-              <ListItemText 
-                primary={text} 
-                sx={{
-                  color: pathname === href ? 'primary.main' : 'inherit',
-                  fontWeight: pathname === href ? 'bold' : 'normal',
-                }}
-              />
-            </ListItem>
-          </Link>
-        ))}
-      </List>
-    </Drawer>
+    <>
+      {/* Mobile drawer */}
+      <Drawer
+        variant="temporary"
+        open={isOpen}
+        onClose={closeSidebar}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: drawerWidth,
+            zIndex: (theme) => theme.zIndex.drawer,
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
+      
+      {/* Desktop drawer */}
+      <Drawer
+        variant="persistent"
+        open={isOpen}
+        sx={{
+          display: { xs: 'none', sm: 'block' },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: drawerWidth,
+            zIndex: (theme) => theme.zIndex.drawer,
+          },
+        }}
+      >
+        {drawer}
+      </Drawer>
+    </>
   );
 }
