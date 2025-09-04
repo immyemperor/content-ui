@@ -123,7 +123,11 @@ export default function TemplatesPage() {
   };
 
   return (
-    <Box>
+    <Box sx={{ 
+      width: '100%',
+      maxWidth: '100%',
+      overflow: 'hidden', // Prevent the container from overflowing
+    }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" component="h1" fontWeight="bold">
           Question Templates
@@ -194,7 +198,16 @@ export default function TemplatesPage() {
           </Button>
         </Paper>
       ) : (
-        <TableContainer component={Paper}>
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            maxWidth: '100%',
+            overflow: 'auto',
+            '& .MuiTable-root': {
+              minWidth: 800, // Minimum width to maintain table structure
+            }
+          }}
+        >
           <Table>
             <TableHead>
               <TableRow>

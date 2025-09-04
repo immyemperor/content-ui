@@ -397,6 +397,47 @@ export default function ContentPage() {
         </Button>
       </Box>
 
+      {/* Instructions Card */}
+      <Card sx={{ mb: 3, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
+        <CardContent>
+          <Box display="flex" alignItems="flex-start" gap={2}>
+            <HelpIcon sx={{ mt: 0.5, color: 'primary.contrastText' }} />
+            <Box>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.contrastText' }}>
+                How to Generate Questions
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2, color: 'primary.contrastText' }}>
+                Follow these steps to create and manage questions for your assessments:
+              </Typography>
+              <Box component="ol" sx={{ pl: 2, color: 'primary.contrastText' }}>
+                <Typography component="li" variant="body2" sx={{ mb: 1 }}>
+                  <strong>Click "Generate Questions"</strong> to open the question generation form
+                </Typography>
+                <Typography component="li" variant="body2" sx={{ mb: 1 }}>
+                  <strong>Fill in the details:</strong>
+                  <Box component="ul" sx={{ pl: 2, mt: 0.5 }}>
+                    <Typography component="li" variant="body2">Topic: Main subject area (e.g., "JavaScript", "React", "Python")</Typography>
+                    <Typography component="li" variant="body2">Subtopic: Specific area within the topic (e.g., "Array Methods", "Hooks")</Typography>
+                    <Typography component="li" variant="body2">Question Type: Choose from Coding, Multiple Choice, True/False, or Code Output MCQ</Typography>
+                    <Typography component="li" variant="body2">Difficulty: Select Easy, Medium, or Hard based on target audience</Typography>
+                    <Typography component="li" variant="body2">Number of Questions: Choose between 10-30 questions per batch</Typography>
+                  </Box>
+                </Typography>
+                <Typography component="li" variant="body2" sx={{ mb: 1 }}>
+                  <strong>Review Generated Questions:</strong> Once generated, questions will appear below with preview options
+                </Typography>
+                <Typography component="li" variant="body2" sx={{ mb: 1 }}>
+                  <strong>Edit if Needed:</strong> Click the edit icon to modify question text, add images, adjust test cases, or update explanations
+                </Typography>
+                <Typography component="li" variant="body2">
+                  <strong>Save Questions:</strong> Click "Save All Questions" to store them in your question bank
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+
       {questions.length > 0 && (
         <Box mb={3}>
           <Button
@@ -411,67 +452,138 @@ export default function ContentPage() {
       )}
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {questions.map((question, index) => (
-          <Card key={index}>
-              <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                  <Typography variant="body1" sx={{ flex: 1, mr: 2 }}>
-                    {question.question_text.text}
-                  </Typography>
-                  <Box>
-                    <IconButton
-                      size="small"
-                      onClick={() => setEditingQuestion({ index, question: { ...question } })}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDeleteQuestion(index)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+        {questions.length === 0 ? (
+          <Paper
+            sx={{
+              p: 6,
+              textAlign: 'center',
+              bgcolor: 'grey.50',
+              border: '2px dashed',
+              borderColor: 'grey.300',
+            }}
+          >
+            <AssessmentIcon sx={{ fontSize: 80, color: 'grey.400', mb: 3 }} />
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              Ready to create questions?
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+              Start by clicking the "Generate Questions" button above. You can create different types of questions 
+              including coding challenges, multiple choice, true/false, and code output questions.
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 500, mx: 'auto', mb: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, textAlign: 'left' }}>
+                <CodeIcon sx={{ color: 'primary.main' }} />
+                <Typography variant="body2">
+                  <strong>Coding Questions:</strong> Perfect for programming assessments with test cases
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, textAlign: 'left' }}>
+                <AssessmentIcon sx={{ color: 'primary.main' }} />
+                <Typography variant="body2">
+                  <strong>Multiple Choice:</strong> Great for testing theoretical knowledge
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, textAlign: 'left' }}>
+                <HelpIcon sx={{ color: 'primary.main' }} />
+                <Typography variant="body2">
+                  <strong>True/False:</strong> Quick knowledge checks and concept validation
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, textAlign: 'left' }}>
+                <VisibilityIcon sx={{ color: 'primary.main' }} />
+                <Typography variant="body2">
+                  <strong>Code Output MCQ:</strong> Test understanding of code execution and results
+                </Typography>
+              </Box>
+            </Box>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<AddIcon />}
+              onClick={() => setIsModalOpen(true)}
+              sx={{ px: 4, py: 1.5 }}
+            >
+              Generate Your First Questions
+            </Button>
+          </Paper>
+        ) : (
+          questions.map((question, index) => (
+            <Card key={index}>
+                <CardContent>
+                  <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                    <Typography variant="body1" sx={{ flex: 1, mr: 2 }}>
+                      {question.question_text.text}
+                    </Typography>
+                    <Box>
+                      <IconButton
+                        size="small"
+                        onClick={() => setEditingQuestion({ index, question: { ...question } })}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteQuestion(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                   </Box>
-                </Box>
-                {question.question_text.starter_code && (
-                  <Box mt={2} mb={2}>
-                    <Typography variant="caption" component="pre" sx={{ 
-                      backgroundColor: 'grey.100',
-                      p: 2,
-                      borderRadius: 1,
-                      overflow: 'auto'
-                    }}>
-                      {question.question_text.starter_code}
+                  {question.question_text.starter_code && (
+                    <Box mt={2} mb={2}>
+                      <Typography variant="caption" component="pre" sx={{ 
+                        backgroundColor: 'grey.100',
+                        p: 2,
+                        borderRadius: 1,
+                        overflow: 'auto'
+                      }}>
+                        {question.question_text.starter_code}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Box mt={1}>
+                    <Typography variant="caption" color="textSecondary">
+                      Topic: {question.topic} | Type: {question.type} | 
+                      Difficulty: {question.difficulty_level} |
+                      Test Cases: {question.test_cases.length}
                     </Typography>
                   </Box>
-                )}
-                <Box mt={1}>
-                  <Typography variant="caption" color="textSecondary">
-                    Topic: {question.topic} | Type: {question.type} | 
-                    Difficulty: {question.difficulty_level} |
-                    Test Cases: {question.test_cases.length}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))
+        )}
         </Box>
 
-      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Generate Questions</DialogTitle>
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <AssessmentIcon />
+            Generate Questions
+          </Box>
+        </DialogTitle>
         <DialogContent>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Tip:</strong> Be specific with your topic and subtopic for better quality questions. 
+              The AI will generate questions tailored to your specifications.
+            </Typography>
+          </Alert>
           <Box mt={2} display="flex" flexDirection="column" gap={3}>
             <TextField
               label="Topic"
               fullWidth
               value={formData.topic}
               onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+              helperText="Main subject area (e.g., JavaScript, React, Python, Data Structures)"
+              placeholder="Enter the main topic..."
             />
             <TextField
               label="Subtopic"
               fullWidth
               value={formData.subtopic}
               onChange={(e) => setFormData({ ...formData, subtopic: e.target.value })}
+              helperText="Specific area within the topic (e.g., Array Methods, React Hooks, Sorting Algorithms)"
+              placeholder="Enter a specific subtopic..."
             />
             <Box sx={{ display: 'flex', gap: 2 }}>
               <TextField
@@ -480,11 +592,32 @@ export default function ContentPage() {
                 sx={{ flex: 1 }}
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as GenerateFormData['type'] })}
+                helperText="Select the type of questions to generate"
               >
-                <MenuItem value="coding">Coding</MenuItem>
-                <MenuItem value="mcq">Multiple Choice</MenuItem>
-                <MenuItem value="true-false">True/False</MenuItem>
-                <MenuItem value="code-output-mcq">Code Output MCQ</MenuItem>
+                <MenuItem value="coding">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">Coding</Typography>
+                    <Typography variant="caption" color="text.secondary">Programming challenges with test cases</Typography>
+                  </Box>
+                </MenuItem>
+                <MenuItem value="mcq">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">Multiple Choice</Typography>
+                    <Typography variant="caption" color="text.secondary">Questions with multiple answer options</Typography>
+                  </Box>
+                </MenuItem>
+                <MenuItem value="true-false">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">True/False</Typography>
+                    <Typography variant="caption" color="text.secondary">Binary choice questions</Typography>
+                  </Box>
+                </MenuItem>
+                <MenuItem value="code-output-mcq">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">Code Output MCQ</Typography>
+                    <Typography variant="caption" color="text.secondary">Predict code execution results</Typography>
+                  </Box>
+                </MenuItem>
               </TextField>
               <TextField
                 select
@@ -492,12 +625,26 @@ export default function ContentPage() {
                 sx={{ flex: 1 }}
                 value={formData.difficulty}
                 onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as 'easy' | 'medium' | 'hard' })}
+                helperText="Target skill level"
               >
-                {difficultyLevels.map((level) => (
-                  <MenuItem key={level} value={level}>
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
-                  </MenuItem>
-                ))}
+                <MenuItem value="easy">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">Easy</Typography>
+                    <Typography variant="caption" color="text.secondary">Beginner level</Typography>
+                  </Box>
+                </MenuItem>
+                <MenuItem value="medium">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">Medium</Typography>
+                    <Typography variant="caption" color="text.secondary">Intermediate level</Typography>
+                  </Box>
+                </MenuItem>
+                <MenuItem value="hard">
+                  <Box>
+                    <Typography variant="body2" fontWeight="bold">Hard</Typography>
+                    <Typography variant="caption" color="text.secondary">Advanced level</Typography>
+                  </Box>
+                </MenuItem>
               </TextField>
             </Box>
             <TextField

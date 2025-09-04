@@ -20,19 +20,17 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           bgcolor: 'background.default',
           p: 3,
           mt: '64px', // Height of AppBar
-          width: { 
-            xs: '100%', 
-            sm: isOpen ? `calc(100% - ${drawerWidth}px)` : '100%' 
-          },
+          minWidth: 0, // Important: allows flex items to shrink below their minimum content size
+          overflow: 'auto', // Ensures content can scroll when needed
+          transition: (theme) =>
+            theme.transitions.create(['margin'], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
           ml: { 
             xs: 0, 
             sm: isOpen ? `${drawerWidth}px` : 0 
           },
-          transition: (theme) =>
-            theme.transitions.create(['margin', 'width'], {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
         }}
       >
         {children}
