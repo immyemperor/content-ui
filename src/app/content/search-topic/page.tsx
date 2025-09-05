@@ -1,31 +1,33 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { topicService } from '@/services/topic';
 import { Question } from '@/types/topic';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 
 export default function SearchTopicPage() {
-  const { isAuthenticated } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const [topic, setTopic] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isLoading) return; // Still loading
+    
+    if (!user) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [user, isLoading, router]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!topic.trim()) return;
 
-    setIsLoading(true);
+    setIsSearching(true);
     setError('');
     try {
       const result = await topicService.searchTopic(topic);
@@ -33,7 +35,7 @@ export default function SearchTopicPage() {
     } catch (err) {
       setError('Failed to generate questions. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsSearching(false);
     }
   };
 
@@ -54,6 +56,18 @@ export default function SearchTopicPage() {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <div>Redirecting to login...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -80,10 +94,10 @@ export default function SearchTopicPage() {
             />
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSearching}
               className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-400"
             >
-              {isLoading ? 'Searching...' : 'Search'}
+              {isSearching ? 'Searching...' : 'Search'}
             </button>
           </div>
         </form>

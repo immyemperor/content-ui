@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/contexts/auth';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { useSidebar } from '@/contexts/sidebar';
 import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
@@ -8,6 +8,10 @@ import { Menu as MenuIcon } from '@mui/icons-material';
 export function Header() {
   const { user, logout } = useAuth();
   const { toggleSidebar } = useSidebar();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <AppBar 
@@ -32,9 +36,9 @@ export function Header() {
           Content Management System
         </Typography>
         <Typography variant="body1" sx={{ mr: 2 }}>
-          {user?.name || user?.username}
+          {user?.profile?.name || user?.profile?.email}
         </Typography>
-        <Button color="inherit" onClick={logout}>
+        <Button color="inherit" onClick={handleLogout}>
           Logout
         </Button>
       </Toolbar>

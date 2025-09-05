@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { theme } from '@/styles/theme';
-import { AuthProvider } from '@/contexts/auth';
+import { AuthProvider } from './AuthProvider';
 
 export function Providers({ children }: PropsWithChildren) {
   return (

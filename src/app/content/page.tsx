@@ -1,19 +1,42 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function ContentManagementPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [content, setContent] = useState([]);
 
   useEffect(() => {
+    if (isLoading) return; // Still loading
+    
     if (!isAuthenticated) {
       router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return <div>Redirecting to login...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -21,13 +44,10 @@ export default function ContentManagementPage() {
         <h1 className="text-3xl font-bold text-gray-900">Content Management</h1>
         <div className="flex items-center gap-4">
           <div className="text-sm text-gray-600">
-            Welcome, {user?.username || 'User'}
+            Welcome, {user?.profile?.name || user?.profile?.preferred_username || user?.profile?.email || 'User'}
           </div>
           <button
-            onClick={() => {
-              const { logout } = useAuth();
-              logout();
-            }}
+            onClick={handleLogout}
             className="text-sm text-red-600 hover:text-red-800"
           >
             Logout

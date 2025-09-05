@@ -2,14 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   distDir: '.next',
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/:path*`,
-      },
-    ];
+  output: 'standalone',
+  experimental: {
+    // Disable static optimization for auth-related pages
+    scrollRestoration: true,
   },
+  // Export configuration for static builds
+  trailingSlash: true,
+  generateBuildId: () => 'build',
 };
 
 module.exports = nextConfig;

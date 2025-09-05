@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getUser, getAccessToken } from '@/lib/oidc';
 import type { Content, Template, Assessment } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
@@ -10,14 +11,30 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Add auth token to requests using OIDC user manager
+api.interceptors.request.use(async (config) => {
+  try {
+    const accessToken = await getAccessToken();
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+  } catch (error) {
+    console.error('Failed to get access token:', error);
   }
   return config;
 });
+
+// Response interceptor to handle authentication errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, redirect to login
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const contentService = {
   // Content Management

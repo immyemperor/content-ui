@@ -1,93 +1,88 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/auth';
-import { authService } from '@/services/auth';
+import { Button, Container, Paper, Typography, Box } from '@mui/material';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const router = useRouter();
+  const { isAuthenticated, isLoading, login } = useAuth();
 
-  const { login } = useAuth();
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-
+  const handleKeycloakLogin = async () => {
     try {
-      const { token, user } = await authService.login(username, password);
-      login(user, token);
-    } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      await login();
+    } catch (error) {
+      console.error('Login failed:', error);
     }
   };
 
+  if (isLoading) {
+    return (
+      <Container component="main" maxWidth="sm">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography>Loading...</Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <Container component="main" maxWidth="sm">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
+          <Typography component="h1" variant="h4" align="center" gutterBottom>
+            Assessment Content Management
+          </Typography>
+          <Typography variant="h6" align="center" color="text.secondary" gutterBottom>
             Sign in to your account
-          </h2>
-          {process.env.NEXT_PUBLIC_USE_MOCK === 'true' && (
-            <div className="mt-2 text-center text-sm text-gray-600">
-              <p>Mock Credentials:</p>
-              <p>Username: admin | Password: admin123</p>
-              <p>Username: user | Password: user123</p>
-            </div>
-          )}
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="username" className="sr-only">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          </Typography>
+          
+          <Box sx={{ mt: 4 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={handleKeycloakLogin}
+              sx={{ py: 1.5 }}
             >
-              Sign in
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              Sign in with Keycloak
+            </Button>
+          </Box>
+
+          <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+            <Typography variant="body2" color="text.secondary" align="center">
+              <strong>Available Test Accounts:</strong>
+            </Typography>
+            <Typography variant="body2" color="text.secondary" align="center">
+              Admin: admin / admin123
+            </Typography>
+            <Typography variant="body2" color="text.secondary" align="center">
+              User: user / user123
+            </Typography>
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
   );
 }
